@@ -12,8 +12,8 @@ export default async function handler(req, res) {
   const { ingredients, useExtra, lang } = req.body;
 
   try {
-    // 💡 오너님의 Gemini 2.5 Flash 모델을 호출하는 정확한 주소
-    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${API_KEY}`, {
+    // 💡 오너님의 Gemini 2.5 Flash 모델을 호출하는 정확한 주소 gemini-2.5-flash
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API_KEY}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
