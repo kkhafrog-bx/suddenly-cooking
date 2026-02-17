@@ -11,8 +11,8 @@ export default async function handler(req, res) {
   const { ingredients, useExtra, lang } = req.body;
 
   try {
-    // 💡 dream-app 성공 공식: v1 주소 + gemini-1.5-flash
-    const response = await fetch(`https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
+    // api/chat.js 내부의 fetch 주소 수정
+const response = await fetch(`https://generativelanguage.googleapis.com/v1/models/gemini-pro:generateContent?key=${apiKey}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
