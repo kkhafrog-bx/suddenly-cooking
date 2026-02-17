@@ -4,9 +4,9 @@
   "version": "1.1.0",
   "type": "module",
   "scripts": {
-  "dev": "vite",
-  "build": "npx vite build",  // vite 앞에 npx를 꼭 붙여줘!
-  "preview": "vite preview"
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
   },
   "dependencies": {
     "antd": "^5.24.1",
