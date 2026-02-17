@@ -12,7 +12,7 @@ export default async function handler(req, res) {
 
   try {
     // 💡 dream-app에서 성공했던 바로 그 주소 (v1beta + gemini-1.5-flash)
-    const GEMINI_API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+    const GEMINI_API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${apiKey}`;
 
     const response = await fetch(GEMINI_API_URL, {
       method: 'POST',
