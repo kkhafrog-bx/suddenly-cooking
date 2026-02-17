@@ -5,7 +5,6 @@ import { GlobalOutlined, LoadingOutlined } from '@ant-design/icons';
 const { Title, Text } = Typography;
 const { TextArea } = Input;
 
-// 언어 타입 정의
 interface Language {
   code: string;
   name: string;
@@ -21,10 +20,8 @@ const languages: Language[] = [
 ];
 
 const translations: Record<string, any> = {
-  ko: { title: '어느덧, 요리', subtitle: '남은 재료가 근사한 한 끼가 되는 순간', placeholder: '계란, 라면, 대파', button: '오늘의 요리 레시피', seasoning: '추가 양념(고추장, 참기름, 김 등) 사용', loading: '🍳 제미나이 셰프가 레시피를 생각 중이에요...' },
-  en: { title: 'Suddenly Cooking', subtitle: 'When leftovers become a great meal', placeholder: 'Egg, Ramen, Leek', button: 'Get Recipe', seasoning: 'Use extra seasoning', loading: '🍳 Chef Gemini is thinking of a recipe...' },
-  ja: { title: 'いつの間にか、料理', subtitle: '残った材料が素敵な食事になる瞬間', placeholder: '卵、ラーメン、ネギ', button: '今日のレシピ', seasoning: '追加調味料の使用', loading: '🍳 シェフがレシピを考えています...' },
-  // ... 다른 언어들도 필요시 loading 문구 추가 가능 (기본값은 영어/한국어로 노출돼!)
+  ko: { title: '어느덧, 요리', subtitle: '남은 재료가 근사한 한 끼가 되는 순간', placeholder: '계란, 라면, 대파', button: '오늘의 요리 레시피', seasoning: '추가 양념 사용', loading: '🍳 2.5 Flash 셰프가 레시피를 생각 중...' },
+  en: { title: 'Suddenly Cooking', subtitle: 'When leftovers become a meal', placeholder: 'Egg, Ramen, Leek', button: 'Get Recipe', seasoning: 'Use extra seasoning', loading: '🍳 2.5 Flash Chef is thinking...' }
 };
 
 const App: React.FC = () => {
@@ -59,11 +56,8 @@ const App: React.FC = () => {
         throw new Error(data.error || 'Failed to get recipe');
       }
     } catch (error: any) {
-      console.error("Client Error:", error);
-      const errorMsg = lang === 'ko' 
-        ? `에러: ${error.message || "서버 통신에 실패했습니다."}` 
-        : `Error: ${error.message || "Failed to communicate with server."}`;
-      setRecipe(errorMsg);
+      console.error(error);
+      setRecipe(lang === 'ko' ? `에러 발생: ${error.message}` : `Error: ${error.message}`);
     } finally {
       setLoading(false);
     }
@@ -72,13 +66,12 @@ const App: React.FC = () => {
   return (
     <ConfigProvider theme={{ token: { colorPrimary: '#8B736A', borderRadius: 12 } }}>
       <div style={{ minHeight: '100vh', background: '#EAEAEA', display: 'flex', flexDirection: 'column' }}>
-        
         <div style={{ padding: '20px', display: 'flex', justifyContent: 'flex-end' }}>
           <Select 
             value={lang}
             variant="borderless"
             style={{ width: 120, background: 'rgba(255,255,255,0.5)', borderRadius: '20px' }} 
-            onChange={(value: string) => setLang(value)}
+            onChange={(val: string) => setLang(val)}
             options={languages.map(l => ({ value: l.code, label: l.name }))}
             suffixIcon={<GlobalOutlined />}
           />
@@ -86,9 +79,7 @@ const App: React.FC = () => {
 
         <div style={{ flex: 1, display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '0 20px 60px' }}>
           <Space direction="vertical" size={30} style={{ width: '100%', maxWidth: 500, textAlign: 'center' }}>
-            
             <div style={{ fontSize: '60px' }}>👨‍🍳</div>
-
             <div>
               <Title level={1} style={{ margin: 0, fontWeight: 800, color: '#333' }}>{t.title}</Title>
               <Text style={{ fontSize: '16px', color: '#777' }}>{t.subtitle}</Text>
@@ -99,7 +90,6 @@ const App: React.FC = () => {
                 <Checkbox checked={useExtra} onChange={e => setUseExtra(e.target.checked)}>
                   {t.seasoning}
                 </Checkbox>
-                
                 <TextArea 
                   rows={2} 
                   placeholder={t.placeholder}
@@ -107,38 +97,33 @@ const App: React.FC = () => {
                   onChange={e => setIngredients(e.target.value)}
                   style={{ padding: '15px', background: '#F5F5F5', border: 'none' }}
                 />
-                
                 <Button 
                   type="primary" 
                   size="large" 
                   block 
                   onClick={getRecipe} 
                   loading={loading}
-                  style={{ height: '55px', fontWeight: 'bold', background: '#8B736A', boxShadow: '0 4px 15px rgba(139, 115, 106, 0.3)' }}
+                  style={{ height: '55px', fontWeight: 'bold', background: '#8B736A' }}
                 >
                   {t.button}
                 </Button>
               </Space>
             </div>
 
-            {/* 🌟 로딩 중일 때 보여주는 메시지 */}
             {loading && (
               <div style={{ marginTop: '20px' }}>
-                <LoadingOutlined style={{ fontSize: 24, color: '#8B736A', marginBottom: '10px' }} spin />
-                <br />
-                <Text style={{ color: '#8B736A' }}>{t.loading || translations.ko.loading}</Text>
+                <LoadingOutlined style={{ fontSize: 24, color: '#8B736A' }} spin />
+                <br /><Text style={{ color: '#8B736A' }}>{t.loading}</Text>
               </div>
             )}
 
-            {/* 🌟 레시피 결과 카드 */}
             {recipe && !loading && (
-              <Card bordered={false} style={{ textAlign: 'left', background: '#fff', borderRadius: '20px', boxShadow: '0 10px 30px rgba(0,0,0,0.05)', marginTop: '20px' }}>
+              <Card bordered={false} style={{ textAlign: 'left', background: '#fff', borderRadius: '20px', boxShadow: '0 10px 30px rgba(0,0,0,0.05)' }}>
                 <Text style={{ fontSize: '16px', lineHeight: '1.8', whiteSpace: 'pre-wrap' }}>{recipe}</Text>
               </Card>
             )}
           </Space>
         </div>
-
         <div style={{ padding: '30px', textAlign: 'center', color: '#999', fontSize: '13px' }}>
           어느덧, 요리 ©2026 Created by kkhafrog
         </div>
