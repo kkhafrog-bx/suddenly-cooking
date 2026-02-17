@@ -1,11 +1,17 @@
 import React, { useState } from 'react';
 import { Input, Button, Card, Typography, Space, Checkbox, Select, ConfigProvider, message } from 'antd';
-import { SendOutlined, GlobalOutlined } from '@ant-design/icons';
+import { GlobalOutlined, LoadingOutlined } from '@ant-design/icons';
 
 const { Title, Text } = Typography;
 const { TextArea } = Input;
 
-const languages = [
+// 언어 타입 정의
+interface Language {
+  code: string;
+  name: string;
+}
+
+const languages: Language[] = [
   { code: 'ko', name: '한국어' }, { code: 'en', name: 'English' },
   { code: 'ja', name: '日本語' }, { code: 'zh', name: '简体中文' },
   { code: 'ar', name: 'العربية' }, { code: 'vi', name: 'Tiếng Việt' },
@@ -15,54 +21,49 @@ const languages = [
 ];
 
 const translations: Record<string, any> = {
-  ko: { title: '어느덧, 요리', subtitle: '남은 재료가 근사한 한 끼가 되는 순간', placeholder: '계란, 라면, 대파', button: '오늘의 요리 레시피', seasoning: '추가 양념(고추장, 참기름, 김 등) 사용' },
-  en: { title: 'Suddenly Cooking', subtitle: 'When leftovers become a great meal', placeholder: 'Egg, Ramen, Leek', button: 'Get Recipe', seasoning: 'Use extra seasoning' },
-  ja: { title: 'いつの間にか、料理', subtitle: '残った材料が素敵な食事になる瞬間', placeholder: '卵、ラーメン、ネギ', button: '今日のレシピ', seasoning: '追加調味料の使用' },
-  zh: { title: '转眼间, 料理', subtitle: '剩余食材化身为美味佳肴의 瞬间', placeholder: '鸡蛋, 方便面, 大葱', button: '今日食谱', seasoning: '使用额外调料' },
-  ar: { title: 'فجأة، الطبخ', subtitle: 'تحويل بقايا الطعام إلى وجبة رائعة', placeholder: 'بيضة، رامين، بصل', button: 'احصل على الوصفة', seasoning: 'إضافة توابل' },
-  vi: { title: 'Bỗng dưng, Nấu ăn', subtitle: 'Khi nguyên liệu thừa trở thành bữa ăn', placeholder: 'Trứng, Mì, Hành', button: 'Lấy công thức', seasoning: 'Thêm gia vị' },
-  th: { title: 'ในที่สุด, การปรุงอาหาร', subtitle: 'เปลี่ยนวัตถุดิบเหลือเป็นมื้อพิเศษ', placeholder: 'ไข่, ราเมน, ต้นหอม', button: 'รับสูตร', seasoning: 'เพิ่มเครื่องปรุง' },
-  id: { title: 'Tiba-tiba, Memasak', subtitle: 'Saat sisa bahan menjadi hidangan lezat', placeholder: 'Telur, Ramen, Daun Bawang', button: 'Dapatkan Resep', seasoning: 'Bumbu tambahan' },
-  ru: { title: 'Вдруг, Кулинария', subtitle: 'Когда остатки становятся блюдом', placeholder: 'Яйцо, Лапша, Лук', button: 'Рецепт', seasoning: 'Специи' },
-  fr: { title: 'Soudain, la Cuisine', subtitle: 'Quand les restes deviennent un repas', placeholder: 'Œuf, Ramen, Poireau', button: 'Recette', seasoning: 'Assaisonnements' },
-  de: { title: 'Plötzlich, Kochen', subtitle: 'Wenn Reste zu einer Mahlzeit werden', placeholder: 'Ei, Ramen, Lauch', button: 'Rezept', seasoning: 'Gewürze' },
-  hi: { title: 'अचानक, खाना बनाना', subtitle: 'बचे हुए खाने से शानदार भोजन', placeholder: 'अंडा, रामेन, प्याज', button: 'नु스खा', seasoning: 'अतिरिक्त मसाले' }
+  ko: { title: '어느덧, 요리', subtitle: '남은 재료가 근사한 한 끼가 되는 순간', placeholder: '계란, 라면, 대파', button: '오늘의 요리 레시피', seasoning: '추가 양념(고추장, 참기름, 김 등) 사용', loading: '🍳 제미나이 셰프가 레시피를 생각 중이에요...' },
+  en: { title: 'Suddenly Cooking', subtitle: 'When leftovers become a great meal', placeholder: 'Egg, Ramen, Leek', button: 'Get Recipe', seasoning: 'Use extra seasoning', loading: '🍳 Chef Gemini is thinking of a recipe...' },
+  ja: { title: 'いつの間にか、料理', subtitle: '残った材料が素敵な食事になる瞬間', placeholder: '卵、ラーメン、ネギ', button: '今日のレシピ', seasoning: '追加調味料の使用', loading: '🍳 シェフがレシピを考えています...' },
+  // ... 다른 언어들도 필요시 loading 문구 추가 가능 (기본값은 영어/한국어로 노출돼!)
 };
 
 const App: React.FC = () => {
-  const [lang, setLang] = useState('ko');
-  const [ingredients, setIngredients] = useState('');
-  const [useExtra, setUseExtra] = useState(true);
-  const [loading, setLoading] = useState(false);
-  const [recipe, setRecipe] = useState('');
+  const [lang, setLang] = useState<string>('ko');
+  const [ingredients, setIngredients] = useState<string>('');
+  const [useExtra, setUseExtra] = useState<boolean>(true);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [recipe, setRecipe] = useState<string>('');
 
   const t = translations[lang] || translations.en;
 
-  // 🚀 진짜 API 호출 로직 복구
   const getRecipe = async () => {
     if (!ingredients.trim()) {
       message.warning(lang === 'ko' ? '재료를 입력해주세요!' : 'Please enter ingredients!');
       return;
     }
     setLoading(true);
-    setRecipe(''); // 새 요청 시 이전 결과 초기화
+    setRecipe(''); 
 
     try {
-      const response = await fetch('/api/chat', { // Vercel Serverless Function 경로 확인 필요
+      const response = await fetch('/api/chat', { 
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ ingredients, useExtra, lang }),
       });
       
       const data = await response.json();
-      if (data.recipe) {
+
+      if (response.ok && data.recipe) {
         setRecipe(data.recipe);
       } else {
-        throw new Error('No recipe data');
+        throw new Error(data.error || 'Failed to get recipe');
       }
-    } catch (error) {
-      console.error(error);
-      setRecipe(lang === 'ko' ? "레시피를 가져오는 데 실패했습니다. 잠시 후 다시 시도해주세요." : "Failed to get recipe. Please try again.");
+    } catch (error: any) {
+      console.error("Client Error:", error);
+      const errorMsg = lang === 'ko' 
+        ? `에러: ${error.message || "서버 통신에 실패했습니다."}` 
+        : `Error: ${error.message || "Failed to communicate with server."}`;
+      setRecipe(errorMsg);
     } finally {
       setLoading(false);
     }
@@ -77,7 +78,7 @@ const App: React.FC = () => {
             value={lang}
             variant="borderless"
             style={{ width: 120, background: 'rgba(255,255,255,0.5)', borderRadius: '20px' }} 
-            onChange={setLang}
+            onChange={(value: string) => setLang(value)}
             options={languages.map(l => ({ value: l.code, label: l.name }))}
             suffixIcon={<GlobalOutlined />}
           />
@@ -100,7 +101,7 @@ const App: React.FC = () => {
                 </Checkbox>
                 
                 <TextArea 
-                  rows={2} // 👈 세로 크기 복구 (4줄 -> 2줄)
+                  rows={2} 
                   placeholder={t.placeholder}
                   value={ingredients}
                   onChange={e => setIngredients(e.target.value)}
@@ -120,8 +121,17 @@ const App: React.FC = () => {
               </Space>
             </div>
 
-            {/* 🌟 결과가 있을 때만 생성되는 카드 디자인 */}
-            {recipe && (
+            {/* 🌟 로딩 중일 때 보여주는 메시지 */}
+            {loading && (
+              <div style={{ marginTop: '20px' }}>
+                <LoadingOutlined style={{ fontSize: 24, color: '#8B736A', marginBottom: '10px' }} spin />
+                <br />
+                <Text style={{ color: '#8B736A' }}>{t.loading || translations.ko.loading}</Text>
+              </div>
+            )}
+
+            {/* 🌟 레시피 결과 카드 */}
+            {recipe && !loading && (
               <Card bordered={false} style={{ textAlign: 'left', background: '#fff', borderRadius: '20px', boxShadow: '0 10px 30px rgba(0,0,0,0.05)', marginTop: '20px' }}>
                 <Text style={{ fontSize: '16px', lineHeight: '1.8', whiteSpace: 'pre-wrap' }}>{recipe}</Text>
               </Card>
