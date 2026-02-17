@@ -11,8 +11,8 @@ export default async function handler(req, res) {
   const { ingredients, useExtra, lang } = req.body;
 
   try {
-    // 💡 dream-app에서 성공했던 바로 그 주소 (v1beta + gemini-1.5-flash)
-    const GEMINI_API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${apiKey}`;
+    // models/ 를 빼고 모델명만 붙이는 방식 (v1 사용)
+const GEMINI_API_URL = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
 
     const response = await fetch(GEMINI_API_URL, {
       method: 'POST',
