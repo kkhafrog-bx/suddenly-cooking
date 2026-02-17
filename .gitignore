@@ -29,3 +29,9 @@ Thumbs.db
 *.njsproj
 *.sln
 *.sw?
+
+.env*
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
