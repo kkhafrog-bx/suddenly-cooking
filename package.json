@@ -1,21 +1,29 @@
 {
   "name": "fridge-chef",
-  "version": "1.0.0",
+  "private": true,
+  "version": "0.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build",  // 이 부분이 중요해!
+    "build": "vite build",
+    "lint": "eslint .",
     "preview": "vite preview"
   },
   "dependencies": {
-    "@ant-design/icons": "^6.1.0",
-    "@google/generative-ai": "^0.24.1",
-    "@heroicons/react": "^2.2.0",
-    "antd": "^6.3.0",
-    "axios": "^1.13.5",
-    "lucide-react": "^0.475.0",
+    "antd": "^5.24.1",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0",
+    "react-dom": "^19.0.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.19.0",
+    "@types/react": "^19.0.8",
+    "@types/react-dom": "^19.0.3",
+    "@vitejs/plugin-react": "^4.3.4",
+    "eslint": "^9.19.0",
+    "eslint-plugin-react-hooks": "^5.0.0",
+    "eslint-plugin-react-refresh": "^0.4.18",
+    "globals": "^15.14.0",
+    "typescript": "~5.7.2",
     "vite": "^6.1.0"
   }
 }
